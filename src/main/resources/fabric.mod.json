@@ -1,29 +1,28 @@
 {
   "schemaVersion": 1,
-  "id": "myopia",
+  "id": "astigmatism",
   "version": "${version}",
-  "name": "Myopia",
-  "description": "Makes all textures use bilinear filtering.",
+  "name": "Astigmatism",
+  "description": "Blur all textures, you have Astigmatism",
   "authors": [
-    "baltdev"
+    "strubium","baltdev"
   ],
   "contact": {
-    "repo": "https://github.com/balt-dev/myopia"
+    "repo": "https://github.com/strubium/myopiamod"
   },
   "license": "MIT",
-  "icon": "assets/myopia/icon.png",
+  "icon": "assets/astigmatism/icon.png",
   "environment": "client",
   "entrypoints": {
     "client": [
-      "mba.sno.myopia.client.MyopiaClient"
+      "com.strubium.astigmatism.client.AstigmatismClient"
     ]
   },
   "mixins": [
-    "myopia.mixins.json"
+    "astigmatism.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=${loader_version}",
-    "fabric": "*",
     "minecraft": ">=1.18"
   }
 }
