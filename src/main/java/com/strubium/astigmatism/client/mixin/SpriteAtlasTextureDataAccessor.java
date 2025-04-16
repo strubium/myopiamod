@@ -11,5 +11,15 @@ import java.util.List;
 public interface SpriteAtlasTextureDataAccessor {
     @Accessor("sprites")
     List<Sprite> getSprites();
+
+    @Accessor("width")
+    int getWidth();
+
+    @Accessor("height")
+    int getHeight();
+
+    @Accessor("maxLevel")
+    int getMaxLevel();
 }
+
 
