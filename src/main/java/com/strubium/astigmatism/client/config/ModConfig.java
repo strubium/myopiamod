@@ -11,6 +11,7 @@ public class ModConfig {
     public float particlesAtlasBlur = 2;
     public float paintingAtlasBlur = 2;
     public float mobeffectsAtlasBlur = 2;
+    public boolean exportAtlases = false;
 
 
     public static ModConfig createDefault() {

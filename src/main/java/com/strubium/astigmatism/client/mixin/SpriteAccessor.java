@@ -7,6 +7,10 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 
 @Mixin(Sprite.class)
 public interface SpriteAccessor {
-    @Accessor("images")
-    NativeImage[] getImages();
+    @Accessor("images") NativeImage[] getImages();
+    @Accessor("x") int getX();
+    @Accessor("y") int getY();
+    @Accessor("width") int getWidth();
+    @Accessor("height") int getHeight();
 }
+
