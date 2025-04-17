@@ -24,30 +24,29 @@ public abstract class ResourceTextureMixin extends AbstractTexture {
     @Shadow
     private Identifier location;
 
+    @Inject(method = "load", at = @At("HEAD"), cancellable = true)
+    private void onLoad(ResourceManager resourceManager, CallbackInfo ci) {
+        try {
+            if (!location.getPath().contains("entity")) return;
 
-@Inject(method = "load", at = @At("HEAD"), cancellable = true)
-private void onLoad(ResourceManager resourceManager, CallbackInfo ci) {
-    try {
-        if (!location.getPath().contains("entity")) return;
+            Resource resource = resourceManager.getResource(location);
 
-        Resource resource = resourceManager.getResource(location);
+            try (InputStream stream = resource.getInputStream()) {
+                NativeImage image = NativeImage.read(NativeImage.Format.RGBA, stream);
+                if (image != null) {
+                    // Apply blur
+                    BlurUtils.applyWeightedBoxBlur(image, ModConfigManager.config.entityTextureBlur);
 
-        try (InputStream stream = resource.getInputStream()) {
-            NativeImage image = NativeImage.read(NativeImage.Format.RGBA, stream);
-            if (image != null) {
-                // Apply blur
-                BlurUtils.applyWeightedBoxBlur(image, ModConfigManager.config.entityTextureBlur);
+                    // Generate and bind a new OpenGL texture ID
+                    int glId = this.getGlId();
+                    TextureUtil.prepareImage(glId, image.getWidth(), image.getHeight());
+                    image.upload(0, 0, 0, false); // Upload to GPU
 
-                // Generate and bind a new OpenGL texture ID
-                int glId = this.getGlId();
-                TextureUtil.prepareImage(glId, image.getWidth(), image.getHeight());
-                image.upload(0, 0, 0, false); // Upload to GPU
-
-                ci.cancel(); // Skip original method
+                    ci.cancel(); // Skip original method
+                }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-    } catch (Exception e) {
-        e.printStackTrace();
     }
-}
 }
