@@ -3,7 +3,7 @@
   "minVersion": "0.8",
   "package": "com.strubium.astigmatism.client.mixin",
   "compatibilityLevel": "JAVA_17",
-  "client": [ "SpriteAtlasTextureDataAccessor", "SpriteAccessor", "SpriteAtlasTextureMixin" ],
+  "client": [ "SpriteAtlasTextureDataAccessor", "SpriteAccessor", "SpriteAtlasTextureMixin", "ResourceTextureMixin" ],
   "injectors": {
     "defaultRequire": 1
   }

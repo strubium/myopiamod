@@ -12,6 +12,7 @@ public class ModConfig {
     public float paintingAtlasBlur = 2;
     public float mobeffectsAtlasBlur = 2;
     public boolean exportAtlases = false;
+    public float entityTextureBlur = 2;
 
 
     public static ModConfig createDefault() {
