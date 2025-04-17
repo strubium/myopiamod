@@ -77,14 +77,12 @@ public class SpriteAtlasTextureMixin {
         int intRadius = (int)Math.ceil(radius);
 
         if (radius > 0) {
-
             NativeImage copy = new NativeImage(width, height, false);
-
             float radiusSq = radius * radius;
 
             for (int x = 0; x < width; x++) {
                 for (int y = 0; y < height; y++) {
-                    float r = 0, g = 0, b = 0, a = 0;
+                    float accR = 0, accG = 0, accB = 0, accA = 0;
                     float weightSum = 0;
 
                     for (int dx = -intRadius; dx <= intRadius; dx++) {
@@ -97,12 +95,18 @@ public class SpriteAtlasTextureMixin {
                                 if (distSq > radiusSq) continue;
 
                                 float weight = (float)Math.exp(-distSq / (2 * radiusSq)); // Gaussian falloff
-
                                 int color = image.getColor(nx, ny);
-                                a += NativeImage.getAlpha(color) * weight;
-                                r += NativeImage.getRed(color) * weight;
-                                g += NativeImage.getGreen(color) * weight;
-                                b += NativeImage.getBlue(color) * weight;
+
+                                float alpha = NativeImage.getAlpha(color) / 255f;
+                                float red   = NativeImage.getRed(color) / 255f;
+                                float green = NativeImage.getGreen(color) / 255f;
+                                float blue  = NativeImage.getBlue(color) / 255f;
+
+                                // Accumulate premultiplied RGB and alpha
+                                accR += red * alpha * weight;
+                                accG += green * alpha * weight;
+                                accB += blue * alpha * weight;
+                                accA += alpha * weight;
 
                                 weightSum += weight;
                             }
@@ -111,13 +115,19 @@ public class SpriteAtlasTextureMixin {
 
                     if (weightSum == 0) continue;
 
-                    int avgA = Math.min(255, Math.max(0, Math.round(a / weightSum)));
-                    int avgR = Math.min(255, Math.max(0, Math.round(r / weightSum)));
-                    int avgG = Math.min(255, Math.max(0, Math.round(g / weightSum)));
-                    int avgB = Math.min(255, Math.max(0, Math.round(b / weightSum)));
+                    float finalAlpha = accA / weightSum;
 
-                    int avgColor = (avgA << 24) | (avgB << 16) | (avgG << 8) | avgR;
-                    copy.setColor(x, y, avgColor);
+                    float finalR = finalAlpha > 0 ? accR / accA : 0;
+                    float finalG = finalAlpha > 0 ? accG / accA : 0;
+                    float finalB = finalAlpha > 0 ? accB / accA : 0;
+
+                    int outA = Math.round(finalAlpha * 255f);
+                    int outR = Math.round(finalR * 255f);
+                    int outG = Math.round(finalG * 255f);
+                    int outB = Math.round(finalB * 255f);
+
+                    int outColor = (outA << 24) | (outB << 16) | (outG << 8) | outR;
+                    copy.setColor(x, y, outColor);
                 }
             }
 
