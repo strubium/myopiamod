@@ -5,7 +5,6 @@ import com.strubium.astigmatism.client.config.ModConfigManager;
 import com.strubium.astigmatism.client.BlurUtils;
 import net.minecraft.client.texture.ResourceTexture;
 import net.minecraft.client.texture.NativeImage;
-import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.client.texture.AbstractTexture;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
@@ -17,6 +16,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.io.InputStream;
+import java.util.Optional;
 
 @Mixin(ResourceTexture.class)
 public abstract class ResourceTextureMixin extends AbstractTexture {
@@ -29,7 +29,10 @@ public abstract class ResourceTextureMixin extends AbstractTexture {
         try {
             if (!location.getPath().contains("entity")) return;
 
-            Resource resource = resourceManager.getResource(location);
+            Optional<Resource> optional = resourceManager.getResource(location);
+            if (optional.isEmpty()) return;
+
+            Resource resource = optional.get();
 
             try (InputStream stream = resource.getInputStream()) {
                 NativeImage image = NativeImage.read(NativeImage.Format.RGBA, stream);
@@ -40,7 +43,7 @@ public abstract class ResourceTextureMixin extends AbstractTexture {
                     // Generate and bind a new OpenGL texture ID
                     int glId = this.getGlId();
                     TextureUtil.prepareImage(glId, image.getWidth(), image.getHeight());
-                    image.upload(0, 0, 0, false); // Upload to GPU
+                    image.upload(0, 0, 0, false);
 
                     ci.cancel(); // Skip original method
                 }
